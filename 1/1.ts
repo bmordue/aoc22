@@ -1,10 +1,10 @@
-const fs = require("fs");
-const readline = require("readline");
+import * as fs from 'fs';
+import * as readline from 'readline';
+import { inspect} from 'util';
 const util = require("util");
 
-const lines: string[] = [];
-
 async function readLines() {
+  let lines = [];
   const fileStream = fs.createReadStream("input.txt");
 
   const rl = readline.createInterface({
@@ -18,9 +18,10 @@ async function readLines() {
     lines.push(line);
   }
   console.log(`read ${lines.length} lines`);
+  return lines;
 }
 
-function processLines() {
+function processLines(lines :string[]) {
   const elfTotals: number[] = [];
   let elfIndex = 0;
   elfTotals[0] = 0;
@@ -52,8 +53,8 @@ function max(arr: number[]) {
 }
 
 async function main() {
-  await readLines();
-  processLines();
+  const lines = await readLines();
+  processLines(lines);
 }
 
 main();
