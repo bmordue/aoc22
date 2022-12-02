@@ -1,4 +1,4 @@
-import { getLines } from '../aocutil';
+import {getLines, sum} from '../aocutil';
  
 function part1(lines :string[]) {
   let score = 0;
@@ -59,18 +59,6 @@ function part2(lines :string[]) {
 
   console.log(`Total score is ${score}`);
 
-}
-
-function sum(arr: number[]) {
-  return arr.reduce((a,b) => a + b);
-}
-
-function sortDesc(arr: number[]) {
-  return arr.sort((a, b) => b - a);
-}
-
-function max(arr: number[]) {
-  return arr.reduce((a, b) => (a > b ? a : b));
 }
 
 async function main() {
