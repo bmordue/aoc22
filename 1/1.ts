@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
 import { inspect} from 'util';
-const util = require("util");
 
 async function readLines() {
   let lines = [];
@@ -39,7 +38,7 @@ function processLines(lines :string[]) {
   });
   console.log(`Highest calorie count is ${max(elfTotals)}`);
   const sorted = sortDesc(elfTotals);
-  console.log(util.inspect(sorted));
+  console.log(inspect(sorted));
   const topThree = sorted[0] + sorted[1] + sorted[2];
   console.log(`Sum of highest three calorie counts is ${topThree}`);
 }
