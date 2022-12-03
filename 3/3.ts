@@ -1,6 +1,4 @@
-import { PRIORITY_HIGHEST } from 'constants';
-import { textSpanOverlap } from 'typescript';
-import { getLines, sum } from '../aocutil';
+import { getLines } from '../aocutil';
 
 function day2part1(lines: string[]) {
   let score = 0;
