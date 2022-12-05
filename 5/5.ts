@@ -58,6 +58,17 @@ function moveCrates(
   // printState(state);
 }
 
+function moveCratesPart2(
+  state: string[][],
+  quantity: number,
+  from: number,
+  to: number
+) {
+  const crates = state[from - 1].slice(-1 * quantity);
+  state[from - 1] = state[from - 1].slice(0, -1 * quantity);
+  state[to - 1] = state[to - 1].concat(crates);
+}
+
 function printState(state: string[][]) {
   console.log("-------");
   let max = 0;
@@ -88,7 +99,7 @@ function peek(arr: Array<any>) {
   return arr[arr.length - 1];
 }
 
-function part1(lines: string[]) {
+function day5(lines: string[]) {
   const input = parseInitialState(lines);
   const state: string[][] = input.state;
   // console.log(inspect(state));
@@ -98,7 +109,7 @@ function part1(lines: string[]) {
     const re = /move (\d*) from (\d*) to (\d*)/;
     const tokens = line.match(re);
     if (tokens) {
-      moveCrates(
+      moveCratesPart2(
         state,
         parseInt(tokens[1]),
         parseInt(tokens[2]),
@@ -108,17 +119,15 @@ function part1(lines: string[]) {
   }
   //  console.log(inspect(state));
 
+  let answer = "";
   for (let stack of state) {
-    console.log(peek(stack));
+    answer += peek(stack).substring(1, 2);
   }
+  console.log(`Tops of the stacks are ${answer}`);
 }
 
-
-
-function part2(lines: string[]) {}
-
 async function main() {
-  part1(await getLines());
+  day5(await getLines());
 }
 
 main();
