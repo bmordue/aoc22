@@ -1,5 +1,4 @@
 import { getLines } from "../aocutil";
-import { inspect } from "util";
 
 interface TreeNode {
   name: string;
@@ -9,16 +8,9 @@ interface TreeNode {
   size: number;
 }
 
-function pwd(tn: TreeNode) {
-  //console.log(`pwd: ${tn.name}`);
-  // console.log(inspect(tn));
-}
-
 // ls or cd
 function handleCommand(currentLocation: TreeNode, line: string) {
-  //console.log(`handleCommand: ${line}`);
   if (line[0] == "l") {
-    pwd(currentLocation);
     return currentLocation;
   }
   const cmdArg = line.substring(3);
@@ -28,7 +20,6 @@ function handleCommand(currentLocation: TreeNode, line: string) {
     case "/":
       let location = currentLocation;
       while (location.parent) {
-        pwd(currentLocation);
         location = location.parent;
       }
       newLocation = location;
@@ -47,7 +38,6 @@ function handleCommand(currentLocation: TreeNode, line: string) {
       }
       break;
   }
-  pwd(currentLocation);
   return newLocation;
 }
 
@@ -127,22 +117,32 @@ function sizePredicate(treeNode: TreeNode): boolean {
   return treeNode.isDir && treeNode.size <= 100000;
 }
 
-function day7_part1(lines: string[]) {
+function day7(lines: string[]) {
   const tree = buildTree(lines);
 
   let solution = 0;
   depthFirstTraverse(tree, dirSizes);
+
+  // part 1
   solution = filterNodes(tree, sizePredicate)
     .map((tn) => tn.size)
     .reduce(sum);
 
-  console.log(`Sum of directory sizes < 100k is ${solution}`);
+  console.log(`Part 1: sum of directory sizes < 100k is ${solution}`);
+
+  // part 2
+  const available = 70000000 - tree.size;
+  const minDelete = 30000000 - available;
+
+  let smallest = filterNodes(tree, (n: TreeNode) => {
+    return n.isDir && n.size > minDelete;
+  }).sort((a, b) => a.size - b.size)[0];
+
+  console.log(`Part 2: smallest dir to delete is ${smallest.size}`);
 }
 
 async function main() {
-  day7_part1(await getLines());
+  day7(await getLines());
 }
-
-// 94853 + 584 = 95437
 
 main();
