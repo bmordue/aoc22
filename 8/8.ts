@@ -73,61 +73,61 @@ function scoreTree(grid: number[][], i: number, j: number): number[] {
     return [0, 0, 0, 0];
   }
   // up down left right
-  let scores: number[] = [1, 1, 1, 1];
+  let treeScores: number[] = [0, 0, 0, 0];
   const height = grid[i][j];
 
-  const col = grid.map((r) => r[j]);
-  scores[0] = scoreFor(col.slice(0, j).reverse(), height); // up
-  scores[1] = scoreFor(col.slice(j + 1), height); // down
-  scores[2] = scoreFor(grid[i].slice(0, i).reverse(), height); // left
-  scores[3] = scoreFor(grid[i].slice(i + 1), height); // right
-  return scores;
+  // const col = grid.map((r) => r[j]);
+  // scores[0] = scoreFor(col.slice(0, j).reverse(), height); // up
+  // scores[1] = scoreFor(col.slice(j + 1), height); // down
+  // scores[2] = scoreFor(grid[i].slice(0, i).reverse(), height); // left
+  // scores[3] = scoreFor(grid[i].slice(i + 1), height); // right
+  // return scores;
 
-  // let blocked = false;
-  // let k = j - 1;
-  // while (!blocked && k > 0) {
-  //   if (grid[i][k] >= height) {
-  //     blocked = true;
-  //   } else {
-  //     k--;
-  //   }
-  // }
+  let blocked = false;
+  let k = j; // - 1;
+  while (!blocked && k > 0) {
+    treeScores[0]++;
+    k--;
+    if (grid[i][k] >= height) {
+      blocked = true;
+    }
+  }
   // treeScores[0] = j - k;
 
-  // blocked = false;
-  // k = j + 1;
-  // while (!blocked && k < grid[i].length) {
-  //   if (grid[i][k] >= height) {
-  //     blocked = true;
-  //   } else {
-  //     k++;
-  //   }
-  // }
+  blocked = false;
+  k = j; // + 1;
+  while (!blocked && k < grid[i].length - 1) {
+    treeScores[1]++;
+    k++;
+    if (grid[i][k] >= height) {
+      blocked = true;
+    }
+  }
   // treeScores[1] = k - j;
 
-  // k = i - 1;
-  // blocked = false;
-  // while (!blocked && k > 0) {
-  //   if (grid[k][j] >= height) {
-  //     blocked = true;
-  //   } else {
-  //     k--;
-  //   }
-  // }
+  k = i; // - 1;
+  blocked = false;
+  while (!blocked && k > 0) {
+    treeScores[2]++;
+    k--;
+    if (grid[k][j] >= height) {
+      blocked = true;
+    }
+  }
   // treeScores[2] = i - k;
 
-  // k = i + 1;
-  // blocked = false;
-  // while (!blocked && k < grid.length) {
-  //   if (grid[k][j] >= height) {
-  //     blocked = true;
-  //   } else {
-  //     k++;
-  //   }
-  // }
+  k = i; // + 1;
+  blocked = false;
+  while (!blocked && k < grid.length - 1) {
+    treeScores[3]++;
+    k++;
+    if (grid[k][j] >= height) {
+      blocked = true;
+    }
+  }
   // treeScores[3] = k - i;
 
-  // return treeScores; //.reduce((a, b) => a * b);
+  return treeScores; //.reduce((a, b) => a * b);
 }
 
 function part2(grid: number[][]) {
