@@ -1,4 +1,3 @@
-import { dir } from "console";
 import { getLines } from "../aocutil";
 
 interface Position {
@@ -40,14 +39,13 @@ function copyPos(pos: Position) {
 function moveTail(start: Position, head: Position) {
   let end = copyPos(start);
 
-  // [2,2]: something has gone wrong!
   const moves = [
     [
-      [2, 2],
+      [-1, -1],
       [-1, -1],
       [-1, 0],
       [-1, 1],
-      [2, 2],
+      [-1, 1],
     ],
     [
       [-1, -1],
@@ -71,11 +69,11 @@ function moveTail(start: Position, head: Position) {
       [1, 1],
     ],
     [
-      [2, 2],
+      [1, -1],
       [1, -1],
       [1, 0],
       [1, 1],
-      [2, 2],
+      [1, 1],
     ],
   ];
 
@@ -84,6 +82,7 @@ function moveTail(start: Position, head: Position) {
 
   end.x += moves[diffX][diffY][0];
   end.y += moves[diffX][diffY][1];
+
   return end;
 }
 
@@ -108,31 +107,32 @@ function posStr(value: Position) {
   return ` (${value.x},${value.y})`;
 }
 
+function tail(arr: Array<any>) {
+  return arr[arr.length - 1];
+}
+
 function day9(lines: string[]) {
-  let H: Position = { x: 0, y: 0 };
-  let T: Position = { x: 0, y: 0 };
-  let visited: Position[] = [T];
-  let headVisits: Position[] = [H];
+  const ropeSize = 10; // ropeSize = 2 for part 1; 10 for part 2
+  let rope: Position[] = new Array(ropeSize).fill({ x: 0, y: 0 });
+
+  let visited: Position[] = [tail(rope)];
 
   lines.forEach((line) => {
     const direction = line.split(" ")[0];
     const steps = parseInt(line.split(" ")[1]);
 
     for (let i = 0; i < steps; i++) {
-      H = moveHead(H, direction);
-      T = moveTail(T, H);
-      visited.push(T);
-      headVisits.push(H);
+      rope[0] = moveHead(rope[0], direction);
+      for (let knot = 1; knot < ropeSize; knot++) {
+        rope[knot] = moveTail(rope[knot], rope[knot - 1], rope, knot);
+      }
+      visited.push(tail(rope));
     }
   });
 
-  // console.log(`Path traced by tail: ${visited.map(posStr)}`);
-  // console.log(`Path traced by head: ${headVisits.map(posStr)}`);
-  const dedup = visited.filter(unique);
-  // printPath(dedup);
-  // console.log(`Deduplicated position visited by tail: ${dedup.map(posStr)}`);
-  console.log(`Part 1: number of positions visited is ${dedup.length}`);
-  // printPath(headVisits.filter(unique));
+  console.log(
+    `Number of positions visited is ${visited.filter(unique).length}`
+  );
 }
 
 async function main() {
