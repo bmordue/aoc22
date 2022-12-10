@@ -32,11 +32,28 @@ function day6(lines: string[]) {
   const strengths = [20, 60, 100, 140, 180, 220].map((i) => regX[i - 1] * i);
   console.log(`strengths: ${strengths}`);
   console.log(`Sum of six signal strengths ${strengths.reduce(sum)}`);
+
+  // part 2
+  let row = '';
+  regX.forEach((s, i) => {
+    const horiz = i % 40;
+    if (horiz == 0) { console.log(row); row = ''; }
+    if (horiz - 1 == s || horiz == s || horiz + 1 == s) {
+      row += '#';
+
+    } else {
+      row += '.';
+    }
+  });
 }
 
 function sum(a: number, b: number) {
   return a + b;
 }
+
+// function part2(lines :string[]) {
+
+// }
 
 async function main() {
   const lines = await getLines();
