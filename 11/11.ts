@@ -1,5 +1,5 @@
 import { match } from "assert";
-import { parse } from "path/posix";
+import { parse, resolve } from "path/posix";
 import { OperationCanceledException } from "typescript";
 import { inspect } from "util";
 import { getLines } from "../aocutil";
@@ -29,6 +29,7 @@ class Monkey {
   testDiv: number;
   trueDest: number; // monkey id
   falseDest: number; // monkey id
+  inspections: number = 0;
 
   constructor(id: number, startItems: number[], op: Operation, testDiv: number, trueDest: number, falseDest: number) {
     this.id = id;
@@ -44,7 +45,7 @@ class Monkey {
 // Operation: new = old * 19
 // Operation: new = old * old
 function parseOperation(input: string) {
-  console.log(`parseOp: ${input}`);
+  // console.log(`parseOp: ${input}`);
   const myStr = input.split('=')[1];
   const tokens = myStr.split(' ');
   const opStr = tokens[2].trim();
@@ -52,7 +53,7 @@ function parseOperation(input: string) {
   const argStr = tokens[3].trim();
 
   let theArg;
-  console.log(`argStr: ${argStr}`)
+  // console.log(`argStr: ${argStr}`)
   if (argStr == 'old') {
     theArg = { isOld: true }
   } else {
@@ -118,18 +119,55 @@ function parseMonkeys(lines: string[]) {
     // console.log(`should be empty: "${line}"`);
 
     const monkey = new Monkey(id, items, operation, divBy, trueDest, falseDest);
-    console.log(`monkey: ${inspect(monkey)}`);
+    // console.log(`monkey: ${inspect(monkey)}`);
 
     monkeys.push(monkey);
   }
 
+  console.log(`Parsed ${monkeys.length} monkeys`);
   return monkeys;
+}
+
+function monkeyInspect(monkey: Monkey, item: number): number {
+  const resolvedArg = monkey.op.arg.isOld ? item : monkey.op.arg.value || 0;
+  let result = 0;
+  if (monkey.op.op == OpTypeEnum.Add) {
+    result = item + resolvedArg;
+  } else {
+    result = item * resolvedArg;
+  }
+  return result;
+}
+
+function monkeyAround(monkey: Monkey, i: number, monkeys: Monkey[]) {
+  while (monkey.startItems.length > 0) {
+    let item = monkey.startItems.shift();
+    if (!item) return;
+    //inspect;
+    item = monkeyInspect(monkey, item);
+    monkey.inspections++;
+    //div by 3;
+    item = Math.floor(item / 3);
+    //test
+    if (item % monkey.testDiv == 0) {
+      monkeys[monkey.trueDest].startItems.push(item);
+    } else {
+      monkeys[monkey.falseDest].startItems.push(item);
+    }
+  };
 }
 
 function day10(lines: string[]) {
   const monkeys: Monkey[] = parseMonkeys(lines);
+  const rounds = 20;
+  for (let i = 0; i < rounds; i++) {
+    monkeys.forEach(monkeyAround);
+  }
 
-  // console.log(inspect(monkeys));
+  monkeys.sort((a, b) => b.inspections - a.inspections);
+  const first = monkeys[0].inspections;
+  const second = monkeys[1].inspections;
+  console.log(`Most active two: ${first}, ${second}; product is ${first * second}`);
 }
 
 async function main() {
