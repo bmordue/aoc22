@@ -1,16 +1,9 @@
-import { match } from "assert";
-import { parse, resolve } from "path/posix";
-import { OperationCanceledException } from "typescript";
 import { inspect } from "util";
 import { getLines } from "../aocutil";
 
 enum OpTypeEnum {
   Mult, Add
 }
-
-// interface Item {
-//   id: number
-// }
 
 interface OperationArg {
   isOld: boolean,
@@ -136,42 +129,47 @@ function monkeyInspect(monkey: Monkey, item: number): number {
   } else {
     result = item * resolvedArg;
   }
-  console.log(`    Worry level is ${monkey.op.op == OpTypeEnum.Add ? "added" : "multiplied"} by ${resolvedArg} to ${result}`);
+  // console.log(`    Worry level is ${monkey.op.op == OpTypeEnum.Add ? "added" : "multiplied"} by ${resolvedArg} to ${result}`);
   return result;
 }
 
 function monkeyAround(monkey: Monkey, i: number, monkeys: Monkey[]) {
-  console.log(`Monkey ${monkey.id}`);
+  // console.log(`Monkey ${monkey.id}:`);
   while (monkey.startItems.length > 0) {
     let item = monkey.startItems.shift();
     if (!item) return;
-    console.log(`  Monkey inspects an item with a worry level of ${item}`);
+    // console.log(`  Monkey inspects an item with a worry level of ${item}`);
     //inspect;
-    item = monkeyInspect(monkey, item);
+    item = monkeyInspect(monkey, item);// % monkey.testDiv;
     monkey.inspections++;
     //div by 3;
-    item = Math.floor(item / 3); // Part 2: skip this step!
-    console.log(`    Monkey gets bored with item. Worry level is divided by 3 to ${item}`);
+    // item = Math.floor(item / 3); // Part 2: skip this step!
+    item = item % partTwoFactor;
+    // console.log(`    Monkey gets bored with item. Worry level is divided by 3 to ${item}`);
 
     //test
     if (item % monkey.testDiv == 0) {
-      console.log(`    Current worry level is divisible by ${monkey.testDiv}`);
-      console.log(`    Item with worry level ${item} is thrown to monkey ${monkey.trueDest}`);
+      // console.log(`    Current worry level is divisible by ${monkey.testDiv}`);
+      // console.log(`    Item with worry level ${item} is thrown to monkey ${monkey.trueDest}`);
       monkeys[monkey.trueDest].startItems.push(item);
     } else {
       monkeys[monkey.falseDest].startItems.push(item);
-      console.log(`    Current worry level is not divisible by ${monkey.testDiv}`);
-      console.log(`    Item with worry level ${item} is thrown to monkey ${monkey.falseDest}`);
+      // console.log(`    Current worry level is not divisible by ${monkey.testDiv}`);
+      // console.log(`    Item with worry level ${item} is thrown to monkey ${monkey.falseDest}`);
     }
   };
 }
 
+let partTwoFactor = 2;
+
 function day10(lines: string[]) {
   const monkeys: Monkey[] = parseMonkeys(lines);
-  const rounds = 20; // part 1: rounds = 20, part 2: rounds = 10000
+  partTwoFactor = monkeys.map((m) => m.testDiv).reduce((a, b) => a * b);
+
+  const rounds = 10000;//10000; // part 1: rounds = 20, part 2: rounds = 10000
   for (let i = 0; i < rounds; i++) {
     monkeys.forEach(monkeyAround);
-    console.log(`${i + 1}: ${monkeys.map((m) => m.inspections)}`);
+    // console.log(`${i + 1}: ${monkeys.map((m) => m.inspections)}`);
   }
 
   monkeys.sort((a, b) => b.inspections - a.inspections);
