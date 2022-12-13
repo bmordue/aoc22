@@ -1,17 +1,6 @@
-import { getLines } from "../aocutil";
+import { getLines, Position, unique, copyPos, tail } from "../aocutil";
 
-interface Position {
-  x: number;
-  y: number;
-}
 
-function unique(value: Position, index: number, array: Position[]): boolean {
-  return (
-    array.findIndex((n: Position) => {
-      return n.x == value.x && n.y == value.y;
-    }) == index
-  );
-}
 
 function moveHead(start: Position, direction: string): Position {
   let end: Position = start;
@@ -30,10 +19,6 @@ function moveHead(start: Position, direction: string): Position {
       break;
   }
   return end;
-}
-
-function copyPos(pos: Position) {
-  return { x: pos.x, y: pos.y };
 }
 
 function moveTail(start: Position, head: Position) {
@@ -103,13 +88,7 @@ function printPath(positions: Position[]) {
   }
 }
 
-function posStr(value: Position) {
-  return ` (${value.x},${value.y})`;
-}
 
-function tail(arr: Array<any>) {
-  return arr[arr.length - 1];
-}
 
 function day9(lines: string[]) {
   const ropeSize = 10; // ropeSize = 2 for part 1; 10 for part 2
@@ -124,7 +103,7 @@ function day9(lines: string[]) {
     for (let i = 0; i < steps; i++) {
       rope[0] = moveHead(rope[0], direction);
       for (let knot = 1; knot < ropeSize; knot++) {
-        rope[knot] = moveTail(rope[knot], rope[knot - 1], rope, knot);
+        rope[knot] = moveTail(rope[knot], rope[knot - 1]); //, rope, knot);
       }
       visited.push(tail(rope));
     }
