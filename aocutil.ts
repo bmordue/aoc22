@@ -10,8 +10,20 @@ export function copyPos(pos: Position) {
   return { x: pos.x, y: pos.y };
 }
 
+export function equalPos(a: Position, b: Position) {
+  return a.x == b.x && a.y == b.y;
+}
+
+export function addPos(a: Position, b: Position): Position {
+  return { x: a.x + b.x, y: a.y + b.y };
+}
+
+export function subtractPos(a: Position, b: Position): Position {
+  return { x: a.x - b.x, y: a.y - b.y };
+}
+
 export function posStr(value: Position) {
-  return ` (${value.x},${value.y})`;
+  return `(${value.x},${value.y})`;
 }
 
 export async function getLines() {
