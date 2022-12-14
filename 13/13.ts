@@ -35,11 +35,16 @@ function day13(lines: string[]) {
     lines.shift();
 
     // compare and record index if correctly sorted
-    // if (correctlyOrdered(leftTree, rightTree)) {
-    //   sumIndices += index;
-    // }
+    console.log(`=== Pair ${index} ===`);
+    if (correctlyOrdered(leftTree, rightTree)) {
+      sumIndices += index;
+      correct.push(index);
+    }
+    console.log();
   }
-  console.log(`Sum of indices is ${sumIndices}`);
+
+  console.log(correct);
+  console.log(`Sum of indices is ${correct.reduce((a, b) => a + b)}`);
 }
 
 function tokenise(line: string, parent: TreeNode) {
@@ -94,11 +99,15 @@ function tokenise(line: string, parent: TreeNode) {
 }
 
 function correctlyOrdered(left: TreeNode, right: TreeNode): boolean | null {
+  console.log(`Compare ${left.value} vs ${right.value}`);
+
   //compare two integers (leaf nodes)
   if (left.children.length == 0 && right.children.length == 0) {
     if (left.value < right.value) {
+      console.log(`left is less than right, so order is correct`);
       return true;
     } else if (left.value > right.value) {
+      console.log(`left is bigger than right, so order is wrong`);
       return false;
     } else {
       return null; // need to keep checking
@@ -113,16 +122,25 @@ function correctlyOrdered(left: TreeNode, right: TreeNode): boolean | null {
   }
 
   for (let i = 0; i < left.children.length; i++) {
+    if (!right.children[i]) {
+      console.log(`left has more items than right, so order is wrong`);
+      return false;
+    }
+    console.log(`compare ${left.children[i].value} vs ${right.children[i].value}`);
     if (left.children[i].value < right.children[i].value) {
+      console.log(`left is less than right, so order is right`)
       return true;
     } else if (left.children[i].value > right.children[i].value) {
+      console.log(`left is bigger than right, so order is wrong`)
       return false;
     }
   }
 
   if (left.children.length < right.children.length) {
+    console.log('left has fewer items, so order right');
     return true;
   } else if (left.children.length < right.children.length) {
+    console.log('should not be able to reach this!');
     return false;
   }
 
