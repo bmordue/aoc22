@@ -1,3 +1,4 @@
+import { DH_CHECK_P_NOT_SAFE_PRIME } from "constants";
 import { inspect } from "util";
 import { getLines, sum } from "../aocutil";
 
@@ -31,6 +32,8 @@ function day13(lines: string[]) {
     rightTree = tokenise(right, rightTree);
     // console.log(`${inspect(leftTree)} | ${inspect(rightTree)}`);
 
+    checkTree(leftTree);
+    checkTree(rightTree);
     // discard blank line
     lines.shift();
 
@@ -45,6 +48,19 @@ function day13(lines: string[]) {
 
   console.log(correct);
   console.log(`Sum of indices is ${correct.reduce((a, b) => a + b)}`);
+}
+
+function checkTree(tree: TreeNode) {
+  let frontier = [tree];
+  while (frontier.length > 0) {
+    let item = frontier.shift();
+    if (item?.children.length == 0) {
+      console.log(item.value);
+    }
+    else {
+      frontier = frontier.concat(item?.children || []);
+    }
+  }
 }
 
 function tokenise(line: string, parent: TreeNode) {
@@ -66,6 +82,10 @@ function tokenise(line: string, parent: TreeNode) {
       openBrackets++;
       currentToken += line[i];
     } else if (line[i] == "," && currentToken != "" && openBrackets == 0) {
+      if (currentToken[0] == ',') {
+        currentToken = currentToken.substring(1);
+        console.log(`trimmed1: ${currentToken}`);
+      }
       let len = tree.children.push({
         parent: tree,
         value: currentToken,
@@ -77,6 +97,11 @@ function tokenise(line: string, parent: TreeNode) {
       openBrackets--;
       currentToken += line[i];
       if (openBrackets == 0 && currentToken != "") {
+        if (currentToken[0] == ',') {
+          currentToken = currentToken.substring(1);
+          console.log(`trimmed2: ${currentToken}`);
+        }
+
         let childTree = tokenise(currentToken, {
           parent: tree,
           children: [],
@@ -92,6 +117,11 @@ function tokenise(line: string, parent: TreeNode) {
   // don't forget the final token!
   if (currentToken != "") {
     // console.log(`final token: ${currentToken}`);
+    if (currentToken[0] == ',') {
+      currentToken = currentToken.substring(1);
+      console.log(`trimmed3: ${currentToken}`);
+    }
+
     tree.children.push({ parent: tree, value: currentToken, children: [] });
   }
 
