@@ -35,15 +35,19 @@ function day13(lines: string[]) {
     lines.shift();
 
     // compare and record index if correctly sorted
-    if (correctlyOrdered(leftTree, rightTree)) {
-      sumIndices += index;
-    }
+    // if (correctlyOrdered(leftTree, rightTree)) {
+    //   sumIndices += index;
+    // }
   }
   console.log(`Sum of indices is ${sumIndices}`);
 }
 
 function tokenise(line: string, parent: TreeNode) {
   // line will always be a list, skip outermost brackets
+  if (line[0] == ',') {
+    line = line.substring(1);
+  }
+
   if (line[0] != "[" || line[line.length - 1] != "]") {
     console.log(`Expected a list; did not get a list: "${line}"`);
   }
@@ -67,7 +71,7 @@ function tokenise(line: string, parent: TreeNode) {
     } else if (line[i] == "]") {
       openBrackets--;
       currentToken += line[i];
-      if (openBrackets == 0) {
+      if (openBrackets == 0 && currentToken != "") {
         let childTree = tokenise(currentToken, {
           parent: tree,
           children: [],
@@ -82,6 +86,7 @@ function tokenise(line: string, parent: TreeNode) {
   }
   // don't forget the final token!
   if (currentToken != "") {
+    // console.log(`final token: ${currentToken}`);
     tree.children.push({ parent: tree, value: currentToken, children: [] });
   }
 
