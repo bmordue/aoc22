@@ -32,8 +32,9 @@ function day13(lines: string[]) {
     rightTree = tokenise(right, rightTree);
     // console.log(`${inspect(leftTree)} | ${inspect(rightTree)}`);
 
-    checkTree(leftTree);
-    checkTree(rightTree);
+    // checkTree(leftTree);
+    // checkTree(rightTree);
+
     // discard blank line
     lines.shift();
 
@@ -47,7 +48,8 @@ function day13(lines: string[]) {
   }
 
   console.log(correct);
-  console.log(`Sum of indices is ${correct.reduce((a, b) => a + b)}`);
+  // console.log(`Sum of indices is ${correct.reduce((a, b) => a + b)}`);
+  console.log(`Sum of indices is ${sumIndices}`);
 }
 
 function checkTree(tree: TreeNode) {
@@ -84,7 +86,7 @@ function tokenise(line: string, parent: TreeNode) {
     } else if (line[i] == "," && currentToken != "" && openBrackets == 0) {
       if (currentToken[0] == ',') {
         currentToken = currentToken.substring(1);
-        console.log(`trimmed1: ${currentToken}`);
+        // console.log(`trimmed1: ${currentToken}`);
       }
       let len = tree.children.push({
         parent: tree,
@@ -99,7 +101,7 @@ function tokenise(line: string, parent: TreeNode) {
       if (openBrackets == 0 && currentToken != "") {
         if (currentToken[0] == ',') {
           currentToken = currentToken.substring(1);
-          console.log(`trimmed2: ${currentToken}`);
+          // console.log(`trimmed2: ${currentToken}`);
         }
 
         let childTree = tokenise(currentToken, {
@@ -119,7 +121,7 @@ function tokenise(line: string, parent: TreeNode) {
     // console.log(`final token: ${currentToken}`);
     if (currentToken[0] == ',') {
       currentToken = currentToken.substring(1);
-      console.log(`trimmed3: ${currentToken}`);
+      // console.log(`trimmed3: ${currentToken}`);
     }
 
     tree.children.push({ parent: tree, value: currentToken, children: [] });
@@ -144,27 +146,49 @@ function correctlyOrdered(left: TreeNode, right: TreeNode): boolean | null {
     }
   }
 
-  if (left.children.length == 0) {
+  // make a leaf into a list
+  if (left.children.length == 0 && left.value != '[]') {
+    console.log(`left: change ${left.value} to [${left.value}]`);
     left.children.push({ parent: left, value: left.value, children: [] });
   }
-  if (right.children.length == 0) {
+  if (right.children.length == 0 && right.value != '[]') {
+    console.log(`right: change ${right.value} to [${right.value}]`);
     right.children.push({ parent: right, value: right.value, children: [] });
   }
 
+  // compare two trees
+  console.log(`1] ${left.value} vs ${right.value}; ${right.children.length}`);
   for (let i = 0; i < left.children.length; i++) {
+
     if (!right.children[i]) {
       console.log(`left has more items than right, so order is wrong`);
       return false;
     }
-    console.log(`compare ${left.children[i].value} vs ${right.children[i].value}`);
-    if (left.children[i].value < right.children[i].value) {
-      console.log(`left is less than right, so order is right`)
-      return true;
-    } else if (left.children[i].value > right.children[i].value) {
-      console.log(`left is bigger than right, so order is wrong`)
-      return false;
+
+
+    let correct = correctlyOrdered(left.children[i], right.children[i]);
+    if (correct != null) {
+      return correct;
     }
   }
+
+
+
+  //   if (!right.children[i]) {
+  //     console.log(`left has more items than right, so order is wrong`);
+  //     return false;
+  //   }
+
+  //   console.log(`2] compare ${left.children[i].value} vs ${right.children[i].value}`);
+  //   console.log(`${right.children.length}: ${right.children.map((c) => c.value)}`);
+  //   if (left.children[i].value < right.children[i].value) {
+  //     console.log(`left is less than right, so order is right`)
+  //     return true;
+  //   } else if (left.children[i].value > right.children[i].value) {
+  //     console.log(`left is bigger than right, so order is wrong`)
+  //     return false;
+  //   }
+  // }
 
   if (left.children.length < right.children.length) {
     console.log('left has fewer items, so order right');
