@@ -2,6 +2,7 @@ import { inspect } from "util";
 import { getLines, sum } from "../aocutil";
 
 interface TreeNode {
+  value: string;
   parent: TreeNode | null;
   children: TreeNode[];
 }
@@ -22,89 +23,103 @@ function day13(lines: string[]) {
     // read a pair
     const left = lines.shift() || "";
     const right = lines.shift() || "";
-    // const leftList = parseList(left);
-    // const rightList = parseList(right);
 
-    const allTokensL: any[] | undefined = [];
-    const allTokensR: any[] | undefined = [];
-    const leftTree = tokenise(left, allTokensL);
-    const rightTree = tokenise(right, allTokensR);
+    let leftTree: TreeNode = { parent: null, children: [], value: left };
+    let rightTree: TreeNode = { parent: null, children: [], value: right };
 
-    console.log(`${inspect(allTokensL)} | ${inspect(allTokensR)}`);
+    leftTree = tokenise(left, leftTree);
+    rightTree = tokenise(right, rightTree);
+    // console.log(`${inspect(leftTree)} | ${inspect(rightTree)}`);
 
     // discard blank line
     lines.shift();
 
-    //compare and record index if correctly sorted
-    // if (correctlyOrdered(leftList, rightList)) {
-    //   sumIndices += index;
-    // }
+    // compare and record index if correctly sorted
+    if (correctlyOrdered(leftTree, rightTree)) {
+      sumIndices += index;
+    }
   }
   console.log(`Sum of indices is ${sumIndices}`);
 }
 
-function buildTree(root: TreeNode, line: string): TreeNode {
-  //   console.log(`Try to parse: ${line}`);
-  let tree: TreeNode = { parent: root, children: [] };
-  line = line.substring(1, line.length); // line will always be a list
-
-  //   for (let i = 0; i < line.length; i++) {
-  //     let char = line[i];
-
-  //     if (char == "[") {
-  //       let j = i;
-  //       let next;
-  //       let openBrackets = 1;
-  //       while (openBrackets > 0) {
-  //         j++;
-  //         next = line[j];
-  //         if (next == "[") {
-  //           openBrackets++;
-  //         } else if (next == "]") {
-  //           openBrackets--;
-  //         }
-  //       }
-  //       const listStr = line.substring(i + 1, j);
-  //       //   console.log(`listStr: ${listStr}`);
-  //       tree.children.push(buildTree(tree, listStr));
-  //       i = j;
-  //     } else if (char == ",") {
-  //       let j = i;
-  //       let next;
-  //       while (next != ",") {
-  //         j++;
-  //         next = line[j];
-  //       }
-  //       tree.children.push;
-  //       i = j;
-  //     }
-  //   }
-  return tree;
-}
-
-function tokenise(line: string, allTokens: any[] = []) {
+function tokenise(line: string, parent: TreeNode) {
   // line will always be a list, skip outermost brackets
-  let tokens: any[] = [];
+  if (line[0] != "[" || line[line.length - 1] != "]") {
+    console.log(`Expected a list; did not get a list: "${line}"`);
+  }
+  let tree: TreeNode = { parent: parent, children: [], value: line };
+  //   let tokens: any[] = [];
   let openBrackets = 0;
   let currentToken = "";
   for (let i = 1; i < line.length - 1; i++) {
+    // console.log(`current token: ${currentToken}`);
     if (line[i] == "[") {
       openBrackets++;
+      currentToken += line[i];
     } else if (line[i] == "," && currentToken != "" && openBrackets == 0) {
-      tokens.push(currentToken);
+      let len = tree.children.push({
+        parent: tree,
+        value: currentToken,
+        children: [],
+      });
+      //   console.log(`push child with value: ${currentToken}; len ${len}`);
       currentToken = "";
     } else if (line[i] == "]") {
       openBrackets--;
+      currentToken += line[i];
       if (openBrackets == 0) {
-        tokens.push(tokenise(currentToken));
+        let childTree = tokenise(currentToken, {
+          parent: tree,
+          children: [],
+          value: currentToken,
+        });
+        tree.children.push(childTree);
+        currentToken = "";
       }
     } else {
       currentToken += line[i];
     }
   }
-  allTokens.push(tokens);
+  // don't forget the final token!
+  if (currentToken != "") {
+    tree.children.push({ parent: tree, value: currentToken, children: [] });
+  }
+
+  return tree;
 }
 
-function correctlyOrdered(leftList: any[], rightList: any[]) {
-  return false;
+function correctlyOrdered(left: TreeNode, right: TreeNode): boolean | null {
+  //compare two integers (leaf nodes)
+  if (left.children.length == 0 && right.children.length == 0) {
+    if (left.value < right.value) {
+      return true;
+    } else if (left.value > right.value) {
+      return false;
+    } else {
+      return null; // need to keep checking
+    }
+  }
+
+  if (left.children.length == 0) {
+    left.children.push({ parent: left, value: left.value, children: [] });
+  }
+  if (right.children.length == 0) {
+    right.children.push({ parent: right, value: right.value, children: [] });
+  }
+
+  for (let i = 0; i < left.children.length; i++) {
+    if (left.children[i].value < right.children[i].value) {
+      return true;
+    } else if (left.children[i].value > right.children[i].value) {
+      return false;
+    }
+  }
+
+  if (left.children.length < right.children.length) {
+    return true;
+  } else if (left.children.length < right.children.length) {
+    return false;
+  }
+
+  return null;
 }
