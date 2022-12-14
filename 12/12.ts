@@ -180,6 +180,15 @@ function gridAt(grid: number[][], pos: Position) {
 }
 
 function day12try2(grid: string[]) {
+  let startingPoints = [];
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[0].length; j++) {
+      if (grid[i][j] == "a") {
+        startingPoints.push({ x: j, y: i });
+      }
+    }
+  }
+
   const startY = grid.findIndex((row) => row.includes("S"));
   const startX = grid[startY].indexOf("S");
   const start = { x: startX, y: startY };
@@ -188,67 +197,70 @@ function day12try2(grid: string[]) {
   const endX = grid[endY].indexOf("E");
   const end = { x: endX, y: endY };
 
-  console.log(`S: ${posStr(start)} E: ${posStr(end)}`);
+  let solutions: { start: Position; steps: number }[] = [];
 
-  let minSteps = 0;
+  for (let start of startingPoints) {
+    // console.log(`S: ${posStr(start)} E: ${posStr(end)}`);
 
-  let numGrid: number[][] = [];
-  //convert grid to numbers
-  for (let i = 0; i < grid.length; i++) {
-    const numRow = [];
-    for (let j = 0; j < grid[i].length; j++) {
-      numRow.push(grid[i].charCodeAt(j));
+    let numGrid: number[][] = [];
+    //convert grid to numbers
+    for (let i = 0; i < grid.length; i++) {
+      const numRow = [];
+      for (let j = 0; j < grid[i].length; j++) {
+        numRow.push(grid[i].charCodeAt(j));
+      }
+      numGrid.push(numRow);
     }
-    numGrid.push(numRow);
-  }
 
-  numGrid[start.y][start.x] = 97; //"a".charCodeAt(0);
-  numGrid[end.y][end.x] = "z".charCodeAt(0);
+    numGrid[start.y][start.x] = 97; //"a".charCodeAt(0);
+    numGrid[end.y][end.x] = "z".charCodeAt(0);
 
-  // console.log(numGrid);
+    // console.log(numGrid);
 
-  let paths: Position[][] = [];
-  let visited: Position[] = [];
+    let paths: Position[][] = [];
+    let visited: Position[] = [];
 
-  let frontier: { c: Position; p: Position[] }[] = [{ c: start, p: [] }];
-  let done = false;
-  while (frontier.length > 0 && !done) {
-    let current = frontier.shift();
-    let curPos = current?.c || { x: -1, y: -1 };
-    let curPath = current?.p || [];
-    let path = [...curPath];
-    path.push(curPos);
-    // let curPos = frontier.shift() || { x: -1, y: -1 };
-    // console.log(
-    //   `curPos: ${posStr(curPos)} | visited ${visited.map(
-    //     posStr
-    //   )} | frontier ${frontier.map(posStr)}`
-    // );
-    if (equalPos(curPos, end)) {
-      // done = true;
-      console.log(`Found a route with ${path.length - 1} steps.`);
-      // console.log(`${visited.map(posStr)}`);
-    }
-    if (!arrayContains(visited, curPos)) {
-      let currentHeight = gridAt(numGrid, curPos);
-      directions.forEach((dir) => {
-        let candidate = addPos(curPos, dir);
-        if (
-          candidate.x >= 0 &&
-          candidate.x < numGrid[0].length &&
-          candidate.y >= 0 &&
-          candidate.y < numGrid.length
-        ) {
-          if (gridAt(numGrid, candidate) <= currentHeight + 1) {
-            frontier.push({ c: candidate, p: path });
+    let frontier: { c: Position; p: Position[] }[] = [{ c: start, p: [] }];
+    let done = false;
+    while (frontier.length > 0 && !done) {
+      let current = frontier.shift();
+      let curPos = current?.c || { x: -1, y: -1 };
+      let curPath = current?.p || [];
+      let path = [...curPath];
+      path.push(curPos);
+      // let curPos = frontier.shift() || { x: -1, y: -1 };
+      // console.log(
+      //   `curPos: ${posStr(curPos)} | visited ${visited.map(
+      //     posStr
+      //   )} | frontier ${frontier.map(posStr)}`
+      // );
+      if (equalPos(curPos, end)) {
+        // done = true;
+        console.log(`Found a route with ${path.length - 1} steps.`);
+        solutions.push({ start: start, steps: path.length - 1 });
+        // console.log(`${visited.map(posStr)}`);
+      }
+      if (!arrayContains(visited, curPos)) {
+        let currentHeight = gridAt(numGrid, curPos);
+        directions.forEach((dir) => {
+          let candidate = addPos(curPos, dir);
+          if (
+            candidate.x >= 0 &&
+            candidate.x < numGrid[0].length &&
+            candidate.y >= 0 &&
+            candidate.y < numGrid.length
+          ) {
+            if (gridAt(numGrid, candidate) <= currentHeight + 1) {
+              frontier.push({ c: candidate, p: path });
+            }
           }
-        }
-      });
-      visited.push(curPos);
+        });
+        visited.push(curPos);
+      }
     }
   }
-
-  //console.log(`Shortest route has ${minSteps} steps.`);
+  // console.log(`All solutions: ${solutions.map((s) => console.log(``))}`);
+  // console.log(`Fewest steps: `)
 }
 
 async function main() {
