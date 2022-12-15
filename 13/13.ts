@@ -1,6 +1,6 @@
-import { DH_CHECK_P_NOT_SAFE_PRIME } from "constants";
-import { inspect } from "util";
 import { getLines, sum } from "../aocutil";
+
+// 6633 is not the right anwer -- too high
 
 interface TreeNode {
   value: string;
@@ -40,7 +40,7 @@ function day13(lines: string[]) {
 
     // compare and record index if correctly sorted
     console.log(`=== Pair ${index} ===`);
-    if (correctlyOrdered(leftTree, rightTree)) {
+    if (correctlyOrdered(leftTree, rightTree, 0)) {
       sumIndices += index;
       correct.push(index);
     }
@@ -130,16 +130,18 @@ function tokenise(line: string, parent: TreeNode) {
   return tree;
 }
 
-function correctlyOrdered(left: TreeNode, right: TreeNode): boolean | null {
-  console.log(`Compare ${left.value} vs ${right.value}`);
+function correctlyOrdered(left: TreeNode, right: TreeNode, depth: number): boolean | null {
+  const indent = new Array(depth).fill('  ').join('');
+
+  console.log(`${indent} Compare ${left.value} vs ${right.value}`);
 
   //compare two integers (leaf nodes)
   if (left.children.length == 0 && right.children.length == 0) {
     if (left.value < right.value) {
-      console.log(`left is less than right, so order is correct`);
+      console.log(`${indent} left is less than right, so order is correct`);
       return true;
     } else if (left.value > right.value) {
-      console.log(`left is bigger than right, so order is wrong`);
+      console.log(`${indent} left is bigger than right, so order is wrong`);
       return false;
     } else {
       return null; // need to keep checking
@@ -148,25 +150,25 @@ function correctlyOrdered(left: TreeNode, right: TreeNode): boolean | null {
 
   // make a leaf into a list
   if (left.children.length == 0 && left.value != '[]') {
-    console.log(`left: change ${left.value} to [${left.value}]`);
+    console.log(`${indent} left: change ${left.value} to [${left.value}]`);
     left.children.push({ parent: left, value: left.value, children: [] });
   }
   if (right.children.length == 0 && right.value != '[]') {
-    console.log(`right: change ${right.value} to [${right.value}]`);
+    console.log(`${indent} right: change ${right.value} to [${right.value}]`);
     right.children.push({ parent: right, value: right.value, children: [] });
   }
 
   // compare two trees
-  console.log(`1] ${left.value} vs ${right.value}; ${right.children.length}`);
+  // console.log(`${indent} ${left.value} vs ${right.value}; ${right.children.length}`);
   for (let i = 0; i < left.children.length; i++) {
 
     if (!right.children[i]) {
-      console.log(`left has more items than right, so order is wrong`);
+      console.log(`${indent} left has more items than right, so order is wrong`);
       return false;
     }
 
 
-    let correct = correctlyOrdered(left.children[i], right.children[i]);
+    let correct = correctlyOrdered(left.children[i], right.children[i], depth + 1);
     if (correct != null) {
       return correct;
     }
@@ -191,10 +193,10 @@ function correctlyOrdered(left: TreeNode, right: TreeNode): boolean | null {
   // }
 
   if (left.children.length < right.children.length) {
-    console.log('left has fewer items, so order right');
+    console.log(`${indent} left has fewer items, so order right`);
     return true;
   } else if (left.children.length < right.children.length) {
-    console.log('should not be able to reach this!');
+    console.log(`${indent} should not be able to reach this!`);
     return false;
   }
 
