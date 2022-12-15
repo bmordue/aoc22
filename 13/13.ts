@@ -1,4 +1,4 @@
-import { getLines, sum } from "../aocutil";
+import { getLines } from "../aocutil";
 
 // 6633 is not the right anwer -- too high
 
@@ -39,12 +39,12 @@ function day13(lines: string[]) {
     lines.shift();
 
     // compare and record index if correctly sorted
-    console.log(`=== Pair ${index} ===`);
+    // console.log(`=== Pair ${index} ===`);
     if (correctlyOrdered(leftTree, rightTree, 0)) {
       sumIndices += index;
       correct.push(index);
     }
-    console.log();
+    // console.log();
   }
 
   console.log(correct);
@@ -58,8 +58,7 @@ function checkTree(tree: TreeNode) {
     let item = frontier.shift();
     if (item?.children.length == 0) {
       console.log(item.value);
-    }
-    else {
+    } else {
       frontier = frontier.concat(item?.children || []);
     }
   }
@@ -67,7 +66,7 @@ function checkTree(tree: TreeNode) {
 
 function tokenise(line: string, parent: TreeNode) {
   // line will always be a list, skip outermost brackets
-  if (line[0] == ',') {
+  if (line[0] == ",") {
     line = line.substring(1);
   }
 
@@ -84,7 +83,7 @@ function tokenise(line: string, parent: TreeNode) {
       openBrackets++;
       currentToken += line[i];
     } else if (line[i] == "," && currentToken != "" && openBrackets == 0) {
-      if (currentToken[0] == ',') {
+      if (currentToken[0] == ",") {
         currentToken = currentToken.substring(1);
         // console.log(`trimmed1: ${currentToken}`);
       }
@@ -99,7 +98,7 @@ function tokenise(line: string, parent: TreeNode) {
       openBrackets--;
       currentToken += line[i];
       if (openBrackets == 0 && currentToken != "") {
-        if (currentToken[0] == ',') {
+        if (currentToken[0] == ",") {
           currentToken = currentToken.substring(1);
           // console.log(`trimmed2: ${currentToken}`);
         }
@@ -119,7 +118,7 @@ function tokenise(line: string, parent: TreeNode) {
   // don't forget the final token!
   if (currentToken != "") {
     // console.log(`final token: ${currentToken}`);
-    if (currentToken[0] == ',') {
+    if (currentToken[0] == ",") {
       currentToken = currentToken.substring(1);
       // console.log(`trimmed3: ${currentToken}`);
     }
@@ -130,18 +129,33 @@ function tokenise(line: string, parent: TreeNode) {
   return tree;
 }
 
-function correctlyOrdered(left: TreeNode, right: TreeNode, depth: number): boolean | null {
-  const indent = new Array(depth).fill('  ').join('');
+function correctlyOrdered(
+  left: TreeNode,
+  right: TreeNode,
+  depth: number
+): boolean | null {
+  const indent = new Array(depth).fill("  ").join("");
 
-  console.log(`${indent} Compare ${left.value} vs ${right.value}`);
+  // console.log(`${indent} Compare ${left.value} vs ${right.value}`);
 
-  //compare two integers (leaf nodes)
+  //compare two leaf nodes
   if (left.children.length == 0 && right.children.length == 0) {
-    if (left.value < right.value) {
-      console.log(`${indent} left is less than right, so order is correct`);
+    const L = parseInt(left.value);
+    const R = parseInt(right.value);
+    // tried to parse '[]' as int
+    if (isNaN(L)) {
+      // console.log(`L isNan: ${left.value}`);
       return true;
-    } else if (left.value > right.value) {
-      console.log(`${indent} left is bigger than right, so order is wrong`);
+    }
+    if (isNaN(R)) {
+      // console.log(`R isNan: ${right.value}`);
+      return false;
+    }
+    if (L < R) {
+      // console.log(`${indent} left is less than right, so order is correct`);
+      return true;
+    } else if (L > R) {
+      // console.log(`${indent} left is bigger than right, so order is wrong`);
       return false;
     } else {
       return null; // need to keep checking
@@ -149,32 +163,34 @@ function correctlyOrdered(left: TreeNode, right: TreeNode, depth: number): boole
   }
 
   // make a leaf into a list
-  if (left.children.length == 0 && left.value != '[]') {
-    console.log(`${indent} left: change ${left.value} to [${left.value}]`);
+  if (left.children.length == 0 && left.value != "[]") {
+    // console.log(`${indent} left: change ${left.value} to [${left.value}]`);
     left.children.push({ parent: left, value: left.value, children: [] });
   }
-  if (right.children.length == 0 && right.value != '[]') {
-    console.log(`${indent} right: change ${right.value} to [${right.value}]`);
+  if (right.children.length == 0 && right.value != "[]") {
+    // console.log(`${indent} right: change ${right.value} to [${right.value}]`);
     right.children.push({ parent: right, value: right.value, children: [] });
   }
 
   // compare two trees
   // console.log(`${indent} ${left.value} vs ${right.value}; ${right.children.length}`);
   for (let i = 0; i < left.children.length; i++) {
-
     if (!right.children[i]) {
-      console.log(`${indent} left has more items than right, so order is wrong`);
+      // console.log(
+      //   `${indent} left has more items than right, so order is wrong`
+      // );
       return false;
     }
 
-
-    let correct = correctlyOrdered(left.children[i], right.children[i], depth + 1);
+    let correct = correctlyOrdered(
+      left.children[i],
+      right.children[i],
+      depth + 1
+    );
     if (correct != null) {
       return correct;
     }
   }
-
-
 
   //   if (!right.children[i]) {
   //     console.log(`left has more items than right, so order is wrong`);
@@ -193,10 +209,10 @@ function correctlyOrdered(left: TreeNode, right: TreeNode, depth: number): boole
   // }
 
   if (left.children.length < right.children.length) {
-    console.log(`${indent} left has fewer items, so order right`);
+    // console.log(`${indent} left has fewer items, so order right`);
     return true;
   } else if (left.children.length < right.children.length) {
-    console.log(`${indent} should not be able to reach this!`);
+    // console.log(`${indent} should not be able to reach this!`);
     return false;
   }
 
