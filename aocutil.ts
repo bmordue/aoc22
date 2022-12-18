@@ -19,7 +19,19 @@ export function addPos(a: Position, b: Position): Position {
 }
 
 export function subtractPos(a: Position, b: Position): Position {
-  return { x: a.x - b.x, y: a.y - b.y };
+  const diff = { x: a.x - b.x, y: a.y - b.y };
+  // console.log(`a: ${posStr(a)} b: ${posStr(b)} diff: ${posStr(diff)}`)
+  return diff;
+}
+
+export function dividePos(numerator: Position, denominator: number) {
+  return { x: numerator.x / denominator, y: numerator.y / denominator };
+}
+
+export function magnitudePos(pos: Position): number {
+  const mag = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
+  // console.log(`pos: ${posStr(pos)}, magnitude: ${mag}`);
+  return mag;
 }
 
 export function posStr(value: Position) {
