@@ -40,7 +40,6 @@ function day14(lines: string[]) {
   console.log(`grid[9][494]: ${grid[9][494]}`)
 
   console.log(`grid size: ${posStr(max)}`);
-  printGrid(grid);
 
   // "draw" rocks
   points.forEach((row) => {
@@ -50,20 +49,24 @@ function day14(lines: string[]) {
     }
   });
 
+  printGrid(grid);
+
   // mark sand entry
   grid[0][500] = '+';
 
   // simulate falling sand
   let done = false;
-  let grains = 1;
+  let grains = 0;
   while (!done) {//&& grains <= 22) {
     done = addSand(grid);
     grains++;
-    if (grains > 20) {
-      console.log(`\ngrains simulated: ${grains} (done: ${done})`);
-      printGrid(grid);
-    }
+    // if (grains > 20) {
+    //   console.log(`\ngrains simulated: ${grains} (done: ${done})`);
+    //   printGrid(grid);
+    // }
   }
+
+  console.log(`${grains - 1} grains came to rest.`);
 }
 
 function sandBlocked(grid: string[][], at: Position) {
@@ -114,9 +117,12 @@ function line(grid: string[][], start: Position, end: Position) {
   const diff = subtractPos(end, start);
   const unitVector = dividePos(diff, magnitudePos(diff));
   let current = start;
+  grid[current.y][current.x] = '#';
+
   while (!equalPos(current, end)) {
-    grid[current.y][current.x] = '#';
     current = addPos(current, unitVector);
+    grid[current.y][current.x] = '#';
+    // console.log(`set ${posStr(current)} to #`)
   }
 }
 
